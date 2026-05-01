@@ -29,8 +29,8 @@
   "scripts": {
     "precommit": "lint-staged",
     "prepublishOnly": "pnpm generate-types && pnpm build",
-    "generate-types": "./generate-types.sh",
-    "build": "./check-types.sh && rm -rf lib/ && tsc -p tsconfig.build.json",
+    "generate-types": "sh ./generate-types.sh",
+    "build": "sh ./check-types.sh && rm -rf lib/ && tsc -p tsconfig.build.json",
     "prepack": "pnpm build",
     "lint": "eslint --ext .ts src",
     "lint:report": "pnpm lint --format json --output-file report.json",
