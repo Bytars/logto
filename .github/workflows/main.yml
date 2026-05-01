@@ -88,20 +88,6 @@ jobs:
       - name: Test
         run: pnpm ci:test
 
-      - name: Codecov core
-        uses: codecov/codecov-action@v4
-        with:
-          flags: core
-          directory: ./packages/core
-          token: ${{ secrets.CODECOV_TOKEN }}
-
-      - name: Codecov ui
-        uses: codecov/codecov-action@v4
-        with:
-          flags: ui
-          directory: ./packages/ui
-          token: ${{ secrets.CODECOV_TOKEN }}
-
   main-dockerize:
     runs-on: ubuntu-latest
 
@@ -117,20 +103,18 @@ jobs:
         uses: docker/build-push-action@v6
         with:
           context: .
-          build-args: | # Test cloud build
+          build-args: |
             additional_connector_args=--cloud
 
   main-alteration:
     runs-on: ubuntu-latest
 
     steps:
-      # ** Checkout fresh and alteration ref **
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
           path: ./fresh
 
-      # Fetch the current version by finding the latest tag starts with "v", e.g. "v1.0.0-beta.19"
       - id: version
         working-directory: ./fresh
         run: echo "current=$(git describe --match "@logto/core@*" --abbrev=0)" >> $GITHUB_OUTPUT
@@ -139,9 +123,8 @@ jobs:
         with:
           ref: ${{ steps.version.outputs.current }}
           path: ./alteration
-      # ** End **
 
-      - name: Copy lockfile # Make setup workflow happy
+      - name: Copy lockfile
         run: cp ./fresh/pnpm-lock.yaml ./
 
       - name: Setup Node and pnpm
@@ -151,7 +134,6 @@ jobs:
           node-version: ^22.14.0
           run-install: false
 
-      # ** Prepack packages **
       - name: Prepack fresh
         working-directory: ./fresh
         run: pnpm i && pnpm prepack
@@ -159,12 +141,10 @@ jobs:
       - name: Prepack alteration
         working-directory: ./alteration
         run: pnpm i && pnpm prepack
-      # ** End **
 
       - name: Setup Postgres
         uses: ikalnytskyi/action-setup-postgres@v6
 
-      # ** Setup up-to-date databases and compare (test `up`) **
       - name: Setup fresh database
         working-directory: ./fresh
         run: pnpm cli db seed --test
@@ -189,9 +169,7 @@ jobs:
       - name: Compare databases
         working-directory: ./fresh
         run: node .scripts/compare-database.js fresh alteration
-      # ** End **
 
-      # ** Setup old databases and compare (test `down`) **
       - name: Setup old database
         working-directory: ./alteration
         run: |
@@ -210,7 +188,6 @@ jobs:
       - name: Compare manifests
         working-directory: ./fresh
         run: node .scripts/compare-database.js fresh old
-      # ** End **
 
       - name: Check alteration sequence
         working-directory: ./fresh
