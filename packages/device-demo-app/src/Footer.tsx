@@ -31,7 +31,7 @@ export const useIsDarkMode = () => {
 
 const Footer = ({ isDarkMode }: { readonly isDarkMode: boolean }) => (
   <div className={styles.footerContainer}>
-    <a
+    {/* <a
       className={styles.footer}
       href={logtoUrl}
       target="_blank"
@@ -45,7 +45,7 @@ const Footer = ({ isDarkMode }: { readonly isDarkMode: boolean }) => (
         src={isDarkMode ? logtoLogoDark : logtoLogoLight}
         alt="Logto"
       />
-    </a>
+    </a> */}
   </div>
 );
 
